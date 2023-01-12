@@ -1785,7 +1785,7 @@ function formSave(){
     
     var xhr2 = new XMLHttpRequest();
     //xhr2.open('POST', 'RisultatiTest', true);
-    xhr2.open('POST', 'http://ssec.isti.cnr.it/upload.php', true);
+    xhr2.open('POST', 'https://ssec.isti.cnr.it/upload.php', true);
     xhr2.onload = function () 
     {
 /*         if (xhr2.status !== 200) 
@@ -1800,7 +1800,7 @@ function formSave(){
     
     var xhr3 = new XMLHttpRequest();
     //xhr3.open('POST', 'RisultatiTest', true);
-    xhr3.open('POST', 'http://ssec.isti.cnr.it/upload.php', true);
+    xhr3.open('POST', 'https://ssec.isti.cnr.it/upload.php', true);
     xhr3.onload = function () 
     {
 /*         if (xhr3.status !== 200) 
