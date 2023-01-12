@@ -1752,25 +1752,25 @@ function endIt(){
 function formSave(){
     //event.preventDefault();
 
-    var filenameST = userId + "TrainingST" + ".csv";
+    //var filenameST = userId + "TrainingST" + ".csv";
     var filenameOST = userId + "OST" + ".csv";
     var filenameRST = userId + "RST" + ".csv";
-    var myBlobST = new Blob([testoRisultati], {type:"text/csv"});
+    //var myBlobST = new Blob([testoRisultati], {type:"text/csv"});
     var myBlobOST = new Blob([testoRisultati3], {type:"text/csv"});
     var myBlobRST = new Blob([testoRisultati5], {type:"text/csv"});
-    var fileST = new File([myBlobST], filenameST);
+    //var fileST = new File([myBlobST], filenameST);
     var fileOST = new File([myBlobOST], filenameOST);
     var fileRST = new File([myBlobRST], filenameRST);
 
-    var formDataST = new FormData();
+    //var formDataST = new FormData();
     var formDataOST = new FormData();
     var formDataRST = new FormData();
-    formDataST.append('fileToUpload', fileST);
+    //formDataST.append('fileToUpload', fileST);
     formDataOST.append('fileToUpload', fileOST);
     formDataRST.append('fileToUpload', fileRST);
     
 
-    var xhr = new XMLHttpRequest();
+/*     var xhr = new XMLHttpRequest();
     //xhr.open('POST', 'RisultatiTest', true);
     xhr.open('POST', 'https://brocciagi.github.io/upload.php', true);
     xhr.onload = function (){
@@ -1781,7 +1781,7 @@ function formSave(){
         console.log("test")
     };
 
-    xhr.send(formDataST);
+    xhr.send(formDataST); */
     
     var xhr2 = new XMLHttpRequest();
     //xhr2.open('POST', 'RisultatiTest', true);
