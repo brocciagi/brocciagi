@@ -1,0 +1,10 @@
+Il numero che segue il due è tre, y
+Se piove puoi usare un ombrello, y
+Posso vedere con gli occhi, y
+Il parrucchiere taglia i capelli, y
+Il colore della banana è giallo, y
+Un libro è uno strumento musicale, n
+Pasqua è nel mese di Novembre, n
+Alle barche piace mangiare patatine, n
+I maiali vivono sulla luna, n
+La cena si mangia con una spada, n
