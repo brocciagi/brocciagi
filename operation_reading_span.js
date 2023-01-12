@@ -1771,8 +1771,8 @@ function formSave(){
     
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'RisultatiTest', true);
-    //xhr.open('POST', 'http://testgiovanna.altervista.org/upload.php', true);
+    //xhr.open('POST', 'RisultatiTest', true);
+    xhr.open('POST', 'https://brocciagi.github.io/upload.php', true);
     xhr.onload = function () 
     {
         if (xhr.status !== 200) 
@@ -1784,8 +1784,8 @@ function formSave(){
     xhr.send(formDataST);
     
     var xhr2 = new XMLHttpRequest();
-    xhr2.open('POST', 'RisultatiTest', true);
-    //xhr2.open('POST', 'http://testgiovanna.altervista.org/upload.php', true);
+    //xhr2.open('POST', 'RisultatiTest', true);
+    xhr2.open('POST', 'https://brocciagi.github.io/upload.php', true);
     xhr2.onload = function () 
     {
         if (xhr2.status !== 200) 
@@ -1797,8 +1797,8 @@ function formSave(){
     xhr2.send(formDataOST);
     
     var xhr3 = new XMLHttpRequest();
-    xhr3.open('POST', 'RisultatiTest', true);
-    //xhr3.open('POST', 'http://testgiovanna.altervista.org/upload.php', true);
+    //xhr3.open('POST', 'RisultatiTest', true);
+    xhr3.open('POST', 'https://brocciagi.github.io/upload.php', true);
     xhr3.onload = function () 
     {
         if (xhr3.status !== 200) 
