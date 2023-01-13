@@ -704,8 +704,8 @@ function operation_present(){
         ].join('');
 
         var p4 = [
-            '<div>N.B.: E\' importante che cerchi di fare del suo meglio sia quando giudica le operazioni sia quando ',
-            'ricorda le serie numeriche, e che non usi alcun supporto per ricordare le serie numeriche.<br><br>',
+            '<div>N.B.: E\' importante che cerchi di fare del suo meglio sia quando giudica le operazioni <br>sia quando ',
+            'ricorda le serie numeriche, <br>e che non usi alcun supporto per ricordare le serie numeriche.<br><br>',
             '<a class="bttn p3" id="p3" title="Inizia l\'operation_span">Inizia</a>'
         ].join('');
 
@@ -889,7 +889,7 @@ function reading_present(){ //come per l'operation mostra le 5 pagine di spiegaz
         'le verrà chiesto di ricordare i numeri nello stesso ordine in cui sono stati presentati.<br><br>',
         'La lunghezza di ogni serie di numeri sarà variabile (da 3 a 5 numeri).<br><br>',
         'I numeri di ogni serie appariranno sullo schermo uno alla volta<br> e ',
-        'ogni numero rimarrà sullo schermo per 1 secondo.<br><br>',
+        'ogni numero rimarrà sullo schermo per <strong>1 secondo</strong>.<br><br>',
         'La seguente immagine mostra un esempio di come verrà presentato il primo numero della serie:</div>'
     ].join('');
 
@@ -1032,8 +1032,8 @@ function reading_present(){ //come per l'operation mostra le 5 pagine di spiegaz
         ].join('');
         
         var p3 = [
-            '<div>N.B.: E\' importante che cerchi di fare del suo meglio sia quando giudica le frasi sia quando ',
-            'ricorda le serie numeriche, e che non usi alcun supporto per ricordare le serie numeriche.<br><br>',
+            '<div>N.B.: E\' importante che cerchi di fare del suo meglio sia quando giudica le frasi <br>sia quando ',
+            'ricorda le serie numeriche, <br>e che non usi alcun supporto per ricordare le serie numeriche.<br><br>',
             '<a class="bttn p3" id="p3" title="Inizia il reading span">Inizia</a>'
         ].join('');
         
