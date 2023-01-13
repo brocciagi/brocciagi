@@ -7,7 +7,7 @@
 var vvv = 1; // var fondamentale, indica a che punto siamo nel test
 var inputNum = new Array();  // array per l'inserimento in input dei numeri
 var generatedNum = new Array();  // array per i numeri generati dal programma
-var grade = 0; // int per indicare il punteggio dell'utente
+//var grade = 0; // int per indicare il punteggio dell'utente
 var x = 0, y = 0; // int per scorrere gli arrays
 var op = 0;  // var che indica a che punto dello span in corso siamo arrivati
 var iterSpan = 2;  // var globale per definire quante volte iterare dentro un round di un test
@@ -35,7 +35,6 @@ var timeOutLight;
 var timeClock;
 
 // TRAINING
-//var again = true; // destinata a ripetere o meno il training
 var trainingFinito = false;
 var trackOST = 0;
 var trackTrack = 0;
@@ -58,13 +57,21 @@ var contRST = 0, rightRST = 0;
 
 // TRACCIAMENTO TABELLA CSV
 var testIndex = 0;
-var dsItemNumber = 0, dsPartialScore = 0, dsTotScore = 0;
-var AttTotalStartTime, AttTotalEndTime;
 var startTime, endTime, durationTime, durStartTime, durEndTime;
+var testoOST = ""
+var testoRST = ""
 
 var nomeUtente = "";
 var Guida = "Guida";
 var Lettere = "Lettere";
+
+var OSName = "Unknown";
+var resultsOST = new Array();
+var resultsRST = new Array();
+var xResultsOST = -1, xResultsRST = -1;
+var totalStartTime, totalEndTime;
+var userId, userAge;
+
 
 var container = [
     '<h2 id="titoloApp"></h2>',
@@ -141,17 +148,6 @@ var question = [
                     '<label> Bassa Conoscenza</label>',
                 '</div>',
             '</div><br><br><br>',
-            '<label style="font-weight:bold;">Assumi sostanze, farmaci o sei affetto da malattie che alterano le funzioni cognitive?</label><br><br>',
-            '<div id="medAsk">',
-                '<div class="bg">',
-                    '<input name="c3" type="radio" id="qSosS">',
-                    '<labe> Sì</label>',
-                '</div>',
-                '<div class="bg">',
-                    '<input name="c3" type="radio" id="qSosN">',
-                    '<label> No</label>',
-                '</div>',
-            '</div><br><br><br>',
             '<div id="inputAsk">',
                 '<div class="bg">',
                     '<label style="font-weight:bold;">Inserisci il tuo Id</label><br>',
@@ -198,17 +194,6 @@ var question2 = [
                     '<label> Bassa Conoscenza</label>',
                 '</div>',
             '</div><br><br>',
-            '<label style="font-weight:bold;">Assumi sostanze, farmaci o sei affetto da malattie che alterano le funzioni cognitive?</label><br><br>',
-            '<div id="medAsk">',
-                '<div class="bg">',
-                    '<input name="c3" type="radio" id="qSosS">',
-                    '<labe> Sì</label>',
-                '</div>',
-                '<div class="bg">',
-                    '<input name="c3" type="radio" id="qSosN">',
-                    '<label> No</label>',
-                '</div>',
-            '</div><br><br>',
             '<div id="inputAsk">',
                 '<div class="bg">',
                     '<label style="font-weight:bold;">Inserisci il tuo Id</label><br>',
@@ -235,31 +220,13 @@ var update = [
         '</fieldset>'
 ].join('');
 
-var OSName = "Unknown";
-var resultsOST = new Array();
-var resultsRST = new Array();
-var recapOST = new Array();
-var recapRST = new Array();
-var recapAtt = new Array();
-var trainingArr = new Array();
-var recapTraAtt = new Array();
-var xResultsOST = -1, xResultsRST = -1, xOST = -1, xRST = -1, xAtt = -1, xTra = -1, xTAtt = -1;
-var totalStartTime, totalEndTime;
-var userId, userAge;
 
-var testoRisultati = "";
-var testoRisultati2 = "";
-var testoRisultati3 = "";
-var testoRisultati4 = "";
-var testoRisultati5 = "";
-var testoRisultati6 = "";
 
-var titoloTrain = "", testoTrain = "";
-var testoOST = "", titoloOST = "", testoRecapOST = "", titoloRecapOST = "";
-var testoRST = "", titoloRST = "", testoRecapRST = "", titoloRecapRST = "";
+// **** //
+// FUNZIONI //
+// **** //
 
-function findOS()
-{
+function findOS(){
     if (window.navigator.userAgent.indexOf("Windows NT 10.0")!== -1) OSName="Windows 10";
     if (window.navigator.userAgent.indexOf("Windows NT 6.2") !== -1) OSName="Windows 8";
     if (window.navigator.userAgent.indexOf("Windows NT 6.1") !== -1) OSName="Windows 7";
@@ -271,74 +238,51 @@ function findOS()
     if (window.navigator.userAgent.indexOf("Linux")          !== -1) OSName="Linux";
 }
 
-window.onload = function() 
-{
-
-    if(window.innerWidth > 1600)
-    {
+window.onload = function(){
+    if(window.innerWidth > 1600){
         document.body.style.fontSize = "16px";
     }
     document.getElementById("container").innerHTML = container;
     console.log(window.innerWidth);
-    if(window.innerWidth <= 1366)
-    {
+    if(window.innerWidth <= 1366){
         document.getElementById("piattaforma").innerHTML = question2;
-    }
-    else
-    {
+    }else{
         document.getElementById("piattaforma").innerHTML = question;
     }
-    document.getElementById("infos").addEventListener("click", function () 
-    {
+    //check sulle domande per i pre-requisiti
+    document.getElementById("infos").addEventListener("click", function (){
         var p = false;
         var listSelected = 0;
         var c1 = document.getElementsByName("c1");
         var c2 = document.getElementsByName("c2");
-        var c3 = document.getElementsByName("c3");
-        for ( var i = 0; i < c1.length; i++ ) 
-        {
-                if (c1[i].checked) 
-                {
+        for ( var i = 0; i < c1.length; i++ ) {
+                if (c1[i].checked) {
                         listSelected++;
                         break;
                 }
         }
-        for ( var i = 0; i < c2.length; i++ ) 
-        {
-                if (c2[i].checked) 
-                {
+        for ( var i = 0; i < c2.length; i++ ) {
+                if (c2[i].checked){
                         listSelected++;
                         break;
                 }
         }
-        for ( var i = 0; i < c3.length; i++ ) 
-        {
-                if (c3[i].checked) 
-                {
-                        listSelected++;
-                        break;
-                }
-        }
-
-        if(document.getElementById("qid").value === "" || document.getElementById("qAge").value === "" || listSelected !== 3)
-        {
+        if(document.getElementById("qid").value === "" || document.getElementById("qAge").value === "" || 
+            listSelected !== 2){
             document.getElementById("adAsk").innerHTML = "Completa tutti i campi";
             p = false;
-        }
-        else
-        {
+        }else{
             p = true;
         }
 
-        if(document.getElementById("qSosS").checked === true || document.getElementById("qPoco").checked === true || 
-                document.getElementById("qDebole").checked === true || (document.getElementById("qAge").value < 18 || document.getElementById("qAge").value > 65))
-        {
+        if(document.getElementById("qPoco").checked === true || 
+           document.getElementById("qDebole").checked === true || 
+           (document.getElementById("qAge").value < 18 || document.getElementById("qAge").value > 65)){
             document.getElementById("adAsk").innerHTML = "Non hai i requisiti necessari a prendere parte a questo test";
             p = false;
         }
         
-        if(p)
-        {
+        if(p){
             findOS();
             Go();
         }
@@ -348,8 +292,7 @@ window.onload = function()
 };
 
 function Go(){
-    if(window.innerWidth > 1600)
-    {
+    if(window.innerWidth > 1600){
         document.body.style.fontSize = "18px";
     }
     userId = document.getElementById("qid").value;
@@ -358,8 +301,7 @@ function Go(){
     document.getElementById("container").innerHTML += update;
     document.getElementById("legtrack").innerHTML = "Percorso Del Test - Utente " + userId;
     var qz = document.getElementsByClassName("arrowTest");
-    for(var e = 0; e < qz.length; e++)
-    {
+    for(var e = 0; e < qz.length; e++){
         qz[e].innerHTML = '\uD83E\uDC6A';
     }
     document.getElementById("Lettere").style.display = "block";
@@ -368,157 +310,31 @@ function Go(){
     ControlloCentrale();
 }
 
-/* function logTrain(a, b)  //crea il titolo per il training
-{
-    xTra++;
-    trainingArr[xTra] = a;
-    
-    if(a === 0) //se è digit
-    {
-        titoloTrain += "TEST INDEX,TEST NAME,DS.DURATION TIME,DS.END TIME,DS.SET SIZE,DS.MAX POINTS,DS.MIN POINTS,DS.OUTCOME,DS.POINTS,DS.QUESTION,DS.RESPONSE,DS.RESULT,DS.START TIME,DS.ITEM NUMBER,";
-    }
-    else if(a === 1) //se è operation o reading
-    {
-        titoloTrain += "TEST INDEX,TEST NAME,ST.ANSWER,ST.DURATION TIME,ST.END TIME,ST.MAX POINTS,ST.MIN POINTS,ST.OUTCOME,ST.POINTS,ST.QUESTION,ST.RESPONSE,ST.RESULT,ST.START TIME,";
-    }
-    
-    testoTrain += b;
-    //sessionStorage.setItem("TR" + xTra, a);
-} */
-
-function logResultsOST(a, b) //crea le intestazioni per OST task e OST digitSpan
-{
+function logResultsOST(b){ //aggiunge alla variabile testoOST l'intestazione per il csv e i valori
     xResultsOST++;  
     resultsOST[xResultsOST] = b;
-    
-    if(a === 0)
-    {
-        titoloOST += "TEST INDEX,TEST NAME,DS.DURATION TIME,DS.END TIME,DS.SET SIZE,DS.MAX POINTS,DS.MIN POINTS,DS.OUTCOME,DS.POINTS,DS.QUESTION,DS.RESPONSE,DS.RESULT,DS.START TIME,DS.ITEM NUMBER,";
+
+    if(xResultsOST==0){ //se è la prima volta che inserisco i dati, inserisco le intestazioni UGUALI PER TUTTI I TASK
+        testoOST += "TEST INDEX,TEST NAME,ITEM SET SIZE,SHOWN ITEM,RIGHT ANSW.,USER ANSW.,RESULT,SCORE,START TIME, END TIME, DURATION"
     }
-    else if(a === 1)
-    {
-        titoloOST += "TEST INDEX,TEST NAME,OST.ANSWER,OST.DURATION TIME,OST.END TIME,OST.MAX POINTS,OST.MIN POINTS,OST.OUTCOME,OST.POINTS,OST.QUESTION,OST.RESPONSE,OST.RESULT,OST.START TIME,";
-    }
-    
+    testoOST += "\n";
     testoOST += b;
-    //sessionStorage.setItem("OS" + xResultsOST, a);
 };
 
-function logResultsRST(a, b) 
-{
+function logResultsRST(b){ //aggiunge alla variabile testoOST l'intestazione per il csv e i valori
     xResultsRST++;  
     resultsRST[xResultsRST] = b;
     
-    if(a === 0)
-    {
-        titoloRST += "TEST INDEX,TEST NAME,DS.DURATION TIME,DS.END TIME,DS.SET SIZE,DS.MAX POINTS,DS.MIN POINTS,DS.OUTCOME,DS.POINTS,DS.QUESTION,DS.RESPONSE,DS.RESULT,DS.START TIME,DS.ITEM NUMBER,";
+    if(xResultsRST==0){ //se è la prima volta che inserisco i dati, inserisco le intestazioni UGUALI PER TUTTI I TASK
+        testoRST += "TEST INDEX,TEST NAME,ITEM SET SIZE,SHOWN ITEM,RIGHT ANSW.,USER ANSW.,RESULT,SCORE,START TIME, END TIME, DURATION"
     }
-    else if(a === 1)
-    {
-        titoloRST += "TEST INDEX,TEST NAME,RST.ANSWER,RST.DURATION TIME,RST.END TIME,RST.MAX POINTS,RST.MIN POINTS,RST.OUTCOME,RST.POINTS,RST.QUESTION,RST.RESPONSE,RST.RESULT,RST.START TIME,";
-    }
-    
+    testoRST += "\n";
     testoRST += b;
-    //sessionStorage.setItem("RS" + xResultsRST, a);
 };
 
-function logOSTRecap(a)
-{
-    xOST++;
-    recapOST[xOST] = a;
-    titoloRecapOST += "OST.ITEM SIZE,OST.N.ITEM,OST.RESULTS,OST.PROPORTION,";
-    testoRecapOST += a;
-    //sessionStorage.setItem("OST" + xOST, a);
-}
-
-function logRSTRecap(a)
-{
-    xRST++;
-    recapRST[xRST] = a;
-    titoloRecapRST += "RST.ITEM SIZE,RST.N.ITEM,RST.RESULTS,RST.PROPORTION,";
-    testoRecapRST += a;
-    //sessionStorage.setItem("RST" + xRST, a);
-}
-
-/* function saveResults(){  //salva i risultati del training 
-    totalEndTime = new Date(new Date().getTime()).toLocaleDateString() + " " + new Date(new Date().getTime()).toLocaleTimeString() + " ." + new Date(new Date().getTime()).getMilliseconds();
-    
-    //  TRAINING
-    testoRisultati = "USER ID,USER YEARS,SEX,OS VERSION,START SESSION TIME,END SESSION TIME,";
-    testoRisultati2 = userId + "," + userAge + "," + "M" + "," + OSName + "," + totalStartTime + "," + totalEndTime + ","; 
-    testoRisultati += titoloTrain;
-    testoRisultati2 += testoTrain;
-    testoRisultati += "\n";
-    testoRisultati += testoRisultati2;
-    var testoBlob = new Blob([testoRisultati], {type:"text/csv"});
-    var textURL = window.URL.createObjectURL(testoBlob);
-    var downloadLink = document.createElement("a");
-    downloadLink.download = userId + "TrainingST" + ".csv";
-    downloadLink.href = textURL;
-    downloadLink.innerHTML = "Scarica i risultati 1 ";
-    //downloadLink.style.display = "none";
-    document.body.appendChild(downloadLink);
-    //downloadLink.click();
-    saveResults2();
-}  */
-
-function saveResults2(){ //salva ii risultati dell'operation span task
-    // OPERATION SPAN
-    testoRisultati3 = "USER ID,USER YEARS,SEX,OS VERSION,START SESSION TIME,END SESSION TIME,,";
-    testoRisultati4 = userId + "," + userAge + "," + "M" + "," + OSName + "," + totalStartTime + "," + totalEndTime + ",,"; 
-    testoRisultati3 += titoloOST;
-    testoRisultati4 += testoOST;
-    testoRisultati3 += ",," + titoloRecapOST;
-    testoRisultati4 += ",," + testoRecapOST;
-    testoRisultati3 += ",," + "CORRECTNESS OF ELABORATION";
-    testoRisultati4 += ",," + contOST;
-    testoRisultati3 += "\n";
-    testoRisultati3 += testoRisultati4;
-    var testoBlob = new Blob([testoRisultati3], {type:"text/csv"});
-    var textURL = window.URL.createObjectURL(testoBlob);
-    var downloadLink = document.createElement("a");
-    downloadLink.download = userId + "OST" + ".csv";
-    downloadLink.href = textURL;
-    downloadLink.innerHTML = "Scarica i risultati 2 ";
-    downloadLink.style.display = "none";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    saveResults3();
-}
-
-function saveResults3(){ //salva i risultati del reading span task
-    // READING SPAN
-    testoRisultati5 = "USER ID,USER YEARS,SEX,OS VERSION,START SESSION TIME,END SESSION TIME,,";
-    testoRisultati6 = userId + "," + userAge + "," + "M" + "," + OSName + "," + totalStartTime + "," + totalEndTime + ",,"; 
-    testoRisultati5 += titoloRST;
-    testoRisultati6 += testoRST;
-    testoRisultati5 += ",," + titoloRecapRST;
-    testoRisultati6 += ",," + testoRecapRST;
-    testoRisultati5 += ",," + "CORRECTNESS OF ELABORATION";
-    testoRisultati6 += ",," + contRST;
-    testoRisultati5 += "\n";
-    testoRisultati5 += testoRisultati6;
-    var testoBlob = new Blob([testoRisultati5], {type:"text/csv"});
-    var textURL = window.URL.createObjectURL(testoBlob);
-    var downloadLink = document.createElement("a");
-    downloadLink.download = userId + "RST" + ".csv";
-    downloadLink.href = textURL;
-    downloadLink.innerHTML = "Scarica i risultati 3 ";
-    downloadLink.style.display = "none";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-}
-
-
-// **** //
-// FUNZIONI //
-// **** //
-
 // CONTROLLO CENTRALE, FUNZIONE BASE SEMPRE IN ESECUZIONE
-function ControlloCentrale()
-{
-    if(vvv !== 6)
-    {
+function ControlloCentrale(){
+    if(vvv !== 6){
         UpdateStatus(vvv);
     }
 
@@ -547,32 +363,24 @@ function ControlloCentrale()
 }
 
 // decide l'ordine tra RST e OST
-function orders()
-{
+function orders(){
     ordineST = Math.floor(Math.random() * 2);
     ordineTra = ordineST;
-    if(ordineST === 0)
-    {
+    if(ordineST === 0){
         document.getElementById("sta2").innerHTML = "Operation Span";
         document.getElementById("sta5").innerHTML = "Reading Span";
         document.getElementById("sta5").style.width = "80px";
-        //document.getElementById("sta2").style.lineHeight = "30px";
-    }
-    else
-    {
+    }else{
         document.getElementById("sta2").innerHTML = "Reading Span";
         document.getElementById("sta5").innerHTML = "Operation Span";
         document.getElementById("sta2").style.width = "80px";
-        //document.getElementById("sta5").style.lineHeight = "30px";
     }
 }
 
 // aggiorna la barra sotto indicante a che punto si è nel test
-function UpdateStatus(a)
-{
+function UpdateStatus(a){
     var qz = document.getElementsByClassName("statusTest");
-    for(var e = 0; e < qz.length; e++)
-    {
+    for(var e = 0; e < qz.length; e++){
         qz[e].style.color = "black";
         qz[e].style.fontWeight = "normal";
     }
@@ -581,15 +389,11 @@ function UpdateStatus(a)
 }
 
 // training iniziale dell'OST e del RST //
-function trainingST(){  //se training è finito fa iniziare il test. Se non è finito controlla l'ordine e chiama i 
-                        // diversi training (funzioni dentro trainingST) che a loro volta chiamano la presentazione del test
+function trainingST(){  
     op = 0;
-    dsItemNumber++;
         
     if(trainingFinito){
-        grade = 0;
         vvv++;
-        dsItemNumber = 0;
         trainingFinito = false;
         trackOST = 0;
         trackTrack++;
@@ -618,22 +422,22 @@ function trainingST(){  //se training è finito fa iniziare il test. Se non è f
     
     function operation_training(){
         if(trackOST === 0){ 
-            iterSpan = 1; //nel training itera due volte
+            iterSpan = 2; 
             trackOST++;
             tout = setTimeout(operation_present, 8);
         }
         else if(trackOST === 1){
-            iterSpan = 1; //nel training itera due volte
+            iterSpan = 2; 
             trackOST++;
             tout = setTimeout(operation_span, 8);
         }
         else if(trackOST === 2){
-            iterSpan = 3; //nel test itera 3 volte
+            iterSpan = 3; 
             trackOST++;
             tout = setTimeout(operation_span, 8);
         }
         else if(trackOST === 3){
-            iterSpan = 3; //nel test itera 3 volte
+            iterSpan = 3; 
             tout = setTimeout(operation_span, 8);
             trainingFinito = true;
         }
@@ -668,105 +472,75 @@ function startST(){
     clearInterval(timeClock);
     op = 0;
     
-    if(ordineST === 0)
-    {
-        if(combOST[0] === 0 && combOST[1] === 0 && combOST[2] === 0 && combOST[3] === 0)
-        {
+    if(ordineST === 0){
+        if(combOST[0] === 0 && combOST[1] === 0 && combOST[2] === 0 && combOST[3] === 0) {
             console.log("OST FINITO");
             ordineST = 1;
-            logOSTRecap(",,," + "PCU" + "," + (dsTotScore/12) + ",");
-            dsTotScore = 0;
             iterSpan = 3;
             vvv++;
             tout = setTimeout(ControlloCentrale, 8);
-        }
-        else
-        {
+        }else{
             var check = false;
             var d = Math.floor(Math.random() * 5) + 2;
             iterSpan = d;
-            switch(d)
-            {
-                case 2: if(combOST[0] !== 0)
-                        {
+            switch(d){
+                case 2: if(combOST[0] !== 0){
                             combOST[0]--;
                             check = true;
                         } break;
-                case 3: if(combOST[1] !== 0)
-                        {
+                case 3: if(combOST[1] !== 0){
                             combOST[1]--;
                             check = true;
                         } break;
-                case 4: if(combOST[2] !== 0)
-                        {
+                case 4: if(combOST[2] !== 0){
                             combOST[2]--;
                             check = true;
                         } break;
-                case 5: if(combOST[3] !== 0)
-                        {
+                case 5: if(combOST[3] !== 0){
                             combOST[3]--;
                             check = true;
                         } break;
             }
-            if(check)
-            {
-                dsItemNumber++;
+            if(check){
                 tout = setTimeout(operation_span, 8);
-            }
-            else
-            {
+            }else{
                 tout = setTimeout(ControlloCentrale, 8);
             }  
         }
     }
-    else if(ordineST === 1)
-    {
-        if(combRST[0] === 0 && combRST[1] === 0 && combRST[2] === 0 && combRST[3] === 0)
-        {
+    else if(ordineST === 1) {
+        if(combRST[0] === 0 && combRST[1] === 0 && combRST[2] === 0 && combRST[3] === 0){
             console.log("RST FINITO");
             ordineST = 0;
-            logRSTRecap(",,," + "PCU" + "," + (dsTotScore/12) + ",");
-            dsTotScore = 0;
             iterSpan = 3;
             vvv++;
             tout = setTimeout(ControlloCentrale, 8);
-        }
-        else
-        {
+        }else{
             var check = false;
             var d = Math.floor(Math.random() * 5) + 2;
             iterSpan = d;
-            switch(d)
-            {
-                case 2: if(combRST[0] !== 0)
-                        {
+            switch(d){
+                case 2: if(combRST[0] !== 0){
                             combRST[0]--;
                             check = true;
                         } break;
-                case 3: if(combRST[1] !== 0)
-                        {
+                case 3: if(combRST[1] !== 0){
                             combRST[1]--;
                             check = true;
                         } break;
-                case 4: if(combRST[2] !== 0)
-                        {
+                case 4: if(combRST[2] !== 0){
                             combRST[2]--;
                             check = true;
                         } break;
-                case 5: if(combRST[3] !== 0)
-                        {
+                case 5: if(combRST[3] !== 0){
                             combRST[3]--;
                             check = true;
                         } break;
             }
 
-            if(check)
-            {
-                dsItemNumber++;
+            if(check){
                 tout = setTimeout(reading_span, 8);
-            }
-            else
-            {
+            }else{
                 tout = setTimeout(ControlloCentrale, 8);
             }  
         }
@@ -774,8 +548,7 @@ function startST(){
 }
 
 // 2 minuti di pausa tra gli ST e l'attenzione divisa
-function relax()
-{
+function relax(){
     var pause = [
         '<div id="divPause">Hai una pausa di 2 minuti',
             '<div id="timePause"></div>',
@@ -789,23 +562,17 @@ function relax()
     clock();
     timeClock = setInterval(clock, 1000);
     
-    function clock()
-    {
+    function clock(){
         distance = distance - 1000;
-        if (distance < 0) 
-        {
+        if (distance < 0){
             clearInterval(timeClock);
             vvv++;
-            dsItemNumber = 0;
             tout = setTimeout(ControlloCentrale, 8);
-        }
-        else
-        {
+        }else{
             var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             var seconds = Math.floor((distance % (1000 * 60)) / 1000);
             document.getElementById("timePause").innerHTML = minutes + "m " + seconds + "s ";
-            if(distance < 10000)
-            {
+            if(distance < 10000){
                 document.getElementById("watchOutTime").innerHTML = "ATTENZIONE!<BR>STA PER INIZIARE UN NUOVO TEST";
             }
         }
@@ -818,10 +585,9 @@ function relax()
 //
 
 // introduzione allo operation span task crea le 4 pagine di spiegazioni e esempi
-function operation_present()
-{
+function operation_present(){
     var p1 = [
-        '<div id="p1">In questo test le saranno mostrate delle serie di numeri.<br><br> Per esempio: 63, 35, 22<br><br> Dopo la presentazione dell’ultimo numero della serie (22 nell’esempio)<br> le verrà chiesto di ricordare i numeri nello stesso ordine in cui sono stati presentati.<br><br> La lunghezza di ogni serie di numeri sarà variabile (da 3 a 5 numeri).<br><br>I numeri di ogni serie appariranno sullo schermo uno alla volta<br> e ogni numero rimarrà sullo schermo per 1 secondo.<br><br>La seguente immagine mostra un esempio di come verrà presentato il primo numero della serie:</div>'
+        '<div id="p1">In questo test le saranno mostrate delle serie di numeri.<br><br> Per esempio: 63, 35, 22<br><br> Dopo la presentazione dell’ultimo numero della serie (22 nell’esempio)<br> le verrà chiesto di ricordare i numeri nello stesso ordine in cui sono stati presentati.<br><br> La lunghezza di ogni serie di numeri sarà variabile (da 3 a 5 numeri).<br><br>I numeri di ogni serie appariranno sullo schermo uno alla volta<br> e ogni numero rimarrà sullo schermo per <strong>1 secondo</strong>.<br><br>La seguente immagine mostra un esempio di come verrà presentato il primo numero della serie:</div>'
     ].join('');
     
     var p3 = [
@@ -859,8 +625,8 @@ function operation_present()
             document.getElementById("p14").innerHTML = "L'operazione valutata è incorretta";
             document.getElementById("p14").style.fontWeight = "bold";
             document.getElementById("p14").style.fontSize = "20px";
-            checkLight(false, 5000);
-            tout = setTimeout(operation_present3, 5001);
+            checkLight(false, 3000);
+            tout = setTimeout(operation_present3, 3001);
         });
         document.getElementById("choice2").addEventListener("click", function (){
             document.getElementById("p2").style.height = "72px";
@@ -871,13 +637,12 @@ function operation_present()
             document.getElementById("p14").innerHTML = "L'operazione valutata è incorretta";
             document.getElementById("p14").style.fontWeight = "bold";
             document.getElementById("p14").style.fontSize = "20px";
-            checkLight(true, 5000);
-            tout = setTimeout(operation_present3, 5001);
+            checkLight(true, 3000);
+            tout = setTimeout(operation_present3, 3001);
         });    
     }
     
-    function operation_present3()
-    {
+    function operation_present3(){
         var p2 = [
             '<div id="p2">Successivamente le verrà presentato il secondo numero della serie, il 35 (nella serie dell’esempio: 63, 35, 22)<br> e immediatamente dopo una nuova operazione.<br><br> Per esempio:</div>'
         ].join('');
@@ -893,8 +658,7 @@ function operation_present()
         buttons();
         document.getElementById("choice1").innerHTML = "Corretta";
         document.getElementById("choice2").innerHTML = "Incorretta";
-        document.getElementById("choice1").addEventListener("click", function() 
-        {
+        document.getElementById("choice1").addEventListener("click", function(){
             document.getElementById("choice1").style.display = "none";
             document.getElementById("choice2").style.display = "none";
             document.getElementById("p2").style.height = "72px";
@@ -903,11 +667,10 @@ function operation_present()
             document.getElementById("p14").innerHTML = "L'operazione valutata è corretta";
             document.getElementById("p14").style.fontWeight = "bold";
             document.getElementById("p14").style.fontSize = "20px";
-            checkLight(true, 450);
-            tout = setTimeout(operation_present4, 5001);
+            checkLight(true, 3000);
+            tout = setTimeout(operation_present4, 3001);
         });
-        document.getElementById("choice2").addEventListener("click", function () 
-        {
+        document.getElementById("choice2").addEventListener("click", function (){
             document.getElementById("p2").style.height = "72px";
             document.getElementById("choice1").style.display = "none";
             document.getElementById("choice2").style.display = "none";
@@ -916,8 +679,8 @@ function operation_present()
             document.getElementById("p14").innerHTML = "L'operazione valutata è corretta";
             document.getElementById("p14").style.fontWeight = "bold";
             document.getElementById("p14").style.fontSize = "20px";
-            checkLight(false, 450);
-            tout = setTimeout(operation_present4, 5001);
+            checkLight(false, 3000);
+            tout = setTimeout(operation_present4, 3001);
         });    
     }
     
@@ -942,14 +705,13 @@ function operation_present()
 
         var p4 = [
             '<div>N.B.: E\' importante che cerchi di fare del suo meglio sia quando giudica le operazioni sia quando ',
-            'ricorda le serie numeriche.<br><br>',
+            'ricorda le serie numeriche, e che non usi alcun supporto per ricordare le serie numeriche.<br><br>',
             '<a class="bttn p3" id="p3" title="Inizia l\'operation_span">Inizia</a>'
         ].join('');
 
         cleanWindow();
         document.getElementById("spanArea").innerHTML += p1 + input;
         document.getElementById("spanArea").innerHTML += p4;
-        //document.getElementById("p4").addEventListener("click", function () {numTrak = 0;opTrak = 0;iterSpan = 3;ControlloCentrale();});
         document.getElementById("p3").addEventListener("click", function () {operation_span();});
     }
 }
@@ -965,7 +727,6 @@ function operation_span(){ //mostra il numero per un secondo e mostra l'operazio
 }
 
 function operation_span_supp(){ //crea i due bottoni
-
     document.getElementById("choice1").innerHTML = "Corretta";
     document.getElementById("choice2").innerHTML = "Incorretta";
     document.getElementById("choice1").addEventListener("click",  function() {operation_span_supp2(true);});
@@ -992,23 +753,21 @@ function operation_span_supp2(a){ //aggiorna i risultati nel log sia per il trai
         real = 0;
     }
     
-    if(opMatch === a){ //se l'utente ha risposto correttamente
-        if(vvv === 1 || vvv === 4){// se è il training aggiungi i dati al log del training
+    if(opMatch === a){ //RISPOSTA GIUSTA
+        if(vvv === 1 || vvv === 4){  // training 
             checkLight(true, 600);
-            //logTrain(1, testIndex + "," + "Operation Span" + "," + real + "," + durationTime + "," + durEndTime + "," + 1 + "," + 0 + "," + "FINISHED" + "," + 1 + "," + OSTResult + "," + usT + "," + "success" + "," + durStartTime + ",");
-        }else{ //se è il test aggiungi i dati al log del test
+        }else{                       // test 
             rightOST++;
             contOST = rightOST/totST;
-            logResultsOST(1, testIndex + "," + "Operation Span" + "," + real + "," + durationTime + "," + durEndTime + "," + 1 + "," + 0 + "," + "FINISHED" + "," + 1 + "," + OSTResult + "," + usT + "," + "success" + "," + durStartTime + ",");
+            logResultsOST(testIndex + "," + "Operation Span" + "," + op + "," + OSTResult + "," + real + "," + usT + "," + "success" + "," + 1 +  "," + durStartTime + "," + durEndTime  + "," + durationTime);
         }
     }
-    else{ //se l'utente ha risposto male 
+    else{ //RISPOSTA SBAGLIATA 
         if(vvv === 1 || vvv === 4) { //training
             checkLight(false, 600);
-            //logTrain(1, testIndex + "," + "Operation Span" + "," + real + "," + durationTime + "," + durEndTime + "," + 1 + "," + 0 + "," + "FINISHED" + "," + 0 + "," + OSTResult + "," + usT + "," + "failure" + "," + durStartTime + ",");
-        }else{ //test
+        }else{                       //test
             contOST = rightOST/totST;
-            logResultsOST(1, testIndex + "," + "Operation Span" + "," + real + "," + durationTime + "," + durEndTime + "," + 1 + "," + 0 + "," + "FINISHED" + "," + 0 + "," + OSTResult + "," + usT + "," + "failure" + "," + durStartTime + ",");
+            logResultsOST(testIndex + "," + "Operation Span" + "," + op + "," + OSTResult + "," + real + "," + usT + "," + "fail" + "," + 0 +  "," + durStartTime + "," + durEndTime  + "," + durationTime);
         }
     }
     
@@ -1089,8 +848,7 @@ function operation(a){
 
     if(correctEquation){
         opMatch = true;
-    }
-    else{
+    }else{
         opMatch = false;
     }
 
@@ -1176,8 +934,8 @@ function reading_present(){ //come per l'operation mostra le 5 pagine di spiegaz
             document.getElementById("p14").innerHTML = "La frase valutata non è reale";
             document.getElementById("p14").style.fontWeight = "bold";
             document.getElementById("p14").style.fontSize = "20px";
-            checkLight(false, 5000);
-            tout = setTimeout(reading_present3, 5001);
+            checkLight(false, 3000);
+            tout = setTimeout(reading_present3, 3001);
         });
         document.getElementById("choice2").addEventListener("click", function () {
             document.getElementById("p18").style.height = "72px";
@@ -1187,9 +945,10 @@ function reading_present(){ //come per l'operation mostra le 5 pagine di spiegaz
             document.getElementById("p14").innerHTML = "La frase valutata non è reale";
             document.getElementById("p14").style.fontWeight = "bold";
             document.getElementById("p14").style.fontSize = "20px";
-            checkLight(true, 5000);
-            tout = setTimeout(reading_present3, 5001);
+            checkLight(true, 3000);
+            tout = setTimeout(reading_present3, 3001);
         });    
+
     }  
     
     function reading_present3(){
@@ -1222,8 +981,8 @@ function reading_present(){ //come per l'operation mostra le 5 pagine di spiegaz
             document.getElementById("p14").innerHTML = "La frase valutata è reale";
             document.getElementById("p14").style.fontWeight = "bold";
             document.getElementById("p14").style.fontSize = "20px";
-            checkLight(true, 5000);
-            tout = setTimeout(reading_present4, 5001);
+            checkLight(true, 3000);
+            tout = setTimeout(reading_present4, 3001);
         });
         document.getElementById("choice2").addEventListener("click", function () {
             document.getElementById("p18").style.height = "72px";
@@ -1233,8 +992,8 @@ function reading_present(){ //come per l'operation mostra le 5 pagine di spiegaz
             document.getElementById("p14").innerHTML = "La frase valutata è reale";
             document.getElementById("p14").style.fontWeight = "bold";
             document.getElementById("p14").style.fontSize = "20px";
-            checkLight(false, 5000);
-            tout = setTimeout(reading_present4, 5001);
+            checkLight(false, 3000);
+            tout = setTimeout(reading_present4, 3001);
         });   
     }  
     
@@ -1273,16 +1032,13 @@ function reading_present(){ //come per l'operation mostra le 5 pagine di spiegaz
         ].join('');
         
         var p3 = [
-            //'<a class="bttn p3" id="p4">Indietro</a>',
             '<div>N.B.: E\' importante che cerchi di fare del suo meglio sia quando giudica le frasi sia quando ',
-            'ricorda le serie numeriche.<br><br>',
-            'Premi “inizia” per fare alcune prove di training prima di fare il test.</div>',
-            '<a class="bttn p3" id="p3">Inizia</a>'
+            'ricorda le serie numeriche, e che non usi alcun supporto per ricordare le serie numeriche.<br><br>',
+            '<a class="bttn p3" id="p3" title="Inizia il reading span">Inizia</a>'
         ].join('');
         
         cleanWindow();
         document.getElementById("spanArea").innerHTML = p2 + input + p3;
-        //document.getElementById("p4").addEventListener("click", function () {numTrak = 0; frTrak = 0;iterSpan = 3;ControlloCentrale();});
         document.getElementById("p3").addEventListener("click", function () {reading_span();});
     }
 }
@@ -1324,38 +1080,32 @@ function reading_span_supp2(a){ //aggiorna i risultati del log sia per il traini
         real = 0;
     }
     
-    if(readMatch === a){ //se la risposta è corretta
+    if(readMatch === a){ //GIUSTO
         if(vvv === 1 || vvv === 4){ //training
             checkLight(true, 600);
-            //logTrain(1, testIndex + "," + "Reading Span" + "," + real + "," + durationTime + "," + durEndTime + "," + 1 + "," + 0 + "," + "FINISHED" + "," + 1 + "," + RSTResult + "," + usT + "," + "success" + "," + durStartTime + ",");
-        }else{ //test
+        }else{                      //test
             rightRST++;
             contRST = rightRST/totST;
-            logResultsRST(1, testIndex + "," + "Reading Span" + "," + real + "," + durationTime + "," + durEndTime + "," + 1 + "," + 0 + "," + "FINISHED" + "," + 1 + "," + RSTResult + "," + usT + "," + "success" + "," + durStartTime + ",");
+            logResultsRST(testIndex + "," + "Reading Span" + "," + op + "," + RSTResult + "," + real + "," + usT + "," + "success" + "," + 1 +   "," + durStartTime + "," + durEndTime  + "," + durationTime);
         }
-    }else{ //se la risposta è sbagliata
-        if(vvv === 1 || vvv === 4){
+    }else{ //SBAGLIATO
+        if(vvv === 1 || vvv === 4){ //training
             checkLight(false, 600);
-            //logTrain(1, testIndex + "," + "Reading Span" + "," + real + "," + durationTime + "," + durEndTime + "," + 1 + "," + 0 + "," + "FINISHED" + "," + 0 + "," + RSTResult + "," + usT + "," + "failure" + "," + durStartTime + ",");
-        }else{
+        }else{                      //test
             contRST = rightRST/totST;
-            logResultsRST(1, testIndex + "," + "Reading Span" + "," + real + "," + durationTime + "," + durEndTime + "," + 1 + "," + 0 + "," + "FINISHED" + "," + 0 + "," + RSTResult + "," + usT + "," + "failure" + "," + durStartTime + ",");
+            logResultsRST(testIndex + "," + "Reading Span" + "," + op + "," + RSTResult + "," + real + "," + usT + "," + "fail" + "," + 0 +  "," + durStartTime + "," + durEndTime  + "," + durationTime);
         }
     }
     
-    if(op !== iterSpan)
-    {
+    if(op !== iterSpan){
         reading_span();
-    }
-    else
-    {
+    }else{
         numberCheck();
     }  
 }
 
 // mostra a schermo la frase da valutare
-function readPhrase()
-{
+function readPhrase(){
     var phrase = [
         '<div id="midWay">',
         '</div>'
@@ -1366,112 +1116,86 @@ function readPhrase()
     durStartTime = new Date(new Date().getTime()).toLocaleTimeString() + " ." + new Date(new Date().getTime()).getMilliseconds();
     startTime = new Date();
     
-    if(vvv === 1 || vvv === 4)
-    {
-        if(typeof frTra[frTrak] === "undefined")
-        {
+    if(vvv === 1 || vvv === 4) {
+        if(typeof frTra[frTrak] === "undefined"){
             var file = "Esterne/silly_training.txt";
             var b = Math.floor(Math.random() * 10);
 
-            while(RSTT[b] === 0)
-            {
+            while(RSTT[b] === 0){
                 b = Math.floor(Math.random() * 10);
             }
             RSTT[b] = 0;
             tout = setTimeout(function () {readTextFile(file, b);}, 8);
-        }
-        else
-        {
-            if(frTra[frTrak].indexOf(".") !== -1)
-            {
+        }else{
+            if(frTra[frTrak].indexOf(".") !== -1){
                 frTra[frTrak] = frTra[frTrak].split(".");
             }
             document.getElementById("midWay").innerHTML = frTra[frTrak][0];
             RSTResult = frTra[frTrak][0].trim();
             readMatch = frTra[frTrak][1].trim();
-            if(readMatch === "true")
-            {
+            if(readMatch === "true"){
                 readMatch = true;
             }
-            else if (readMatch === "false")
-            {
+            else if (readMatch === "false"){
                 readMatch = false;
             }
             frTrak++;
         }  
-    }
-    else
-    {
+    }else{
         choosePhrase();
     }
     
-    function choosePhrase()
-    {
+    function choosePhrase(){
         var file, b, bz, check1 = 0, check2 = 0;
         
-        for(var a = 0; a <= RST1.length; a++)
-        {
-            if(RST1[a] === 1)
-            {
+        for(var a = 0; a <= RST1.length; a++){
+            if(RST1[a] === 1){
                 check1 = 1;
             }
         }
 
-        for(var a = 0; a <= RST2.length; a++)
-        {
-            if(RST2[a] === 1)
-            {
+        for(var a = 0; a <= RST2.length; a++){
+            if(RST2[a] === 1){
                 check2 = 1;
             }
         }
 
-        if(check1 === 0 && check2 === 0)
-        {
+        if(check1 === 0 && check2 === 0){
             tout = setTimeout(ControlloCentrale, 8);
         }
-        else if(check1 === 0 && check2 === 1)
-        {
+        else if(check1 === 0 && check2 === 1){
             bz = 2;
         }
-        else if(check1 === 1 && check2 === 0)
-        {
+        else if(check1 === 1 && check2 === 0){
             bz = 1;
-        }
-        else
-        {
+        }else{
             bz = Math.floor((Math.random() * 2)) +1;
         }
 
 
-        if(bz === 1)
-        {
+        if(bz === 1){
             b = Math.floor(Math.random() * 21);
 
-            while(RST1[b] === 0)
-            {
+            while(RST1[b] === 0){
                 b = Math.floor(Math.random() * 21);
             }
 
             file = "Esterne/silly_sentences_1.txt";
-            if(vvv !== 1 && vvv !== 4)
-            {
+            if(vvv !== 1 && vvv !== 4){
                 RST1[b] = 0;
             }
             tout = setTimeout(function () {readTextFile(file, b);}, 2);
 
         }
-        else if(bz === 2)
-        {
+        else if(bz === 2){
             b = Math.floor(Math.random() * 21);
 
-            while(RST2[b] === 0)
-            {
+            while(RST2[b] === 0){
                 b = Math.floor(Math.random() * 21);
             }
 
             file = "Esterne/silly_sentences_2.txt";
-            if(vvv !== 1 && vvv !== 4)
-            {
+            if(vvv !== 1 && vvv !== 4){
                 RST2[b] = 0;
             }
             tout = setTimeout(function () {readTextFile(file, b);}, 2);
@@ -1479,30 +1203,24 @@ function readPhrase()
     }
     
     // prende una frase da mostrare da sillysentences1 o sillysentences2
-    function readTextFile(file, b)
-    {
+    function readTextFile(file, b){
 
         var rawFile = new XMLHttpRequest();
         rawFile.open("GET", file , true);
         rawFile.overrideMimeType('text/xml; charset=iso-8859-1');
-        rawFile.onreadystatechange = function ()
-        {
-            if(rawFile.readyState === 4)
-            {
-                if(rawFile.status === 200 || rawFile.status === 0)
-                {
+        rawFile.onreadystatechange = function (){
+            if(rawFile.readyState === 4){
+                if(rawFile.status === 200 || rawFile.status === 0){
                     var allText = rawFile.responseText;
                     allText = allText.split("\n");
 
                     allText[b] = allText[b].split(", ");
 
                     var fixedstring;
-                    try
-                    {
+                    try{
                         fixedstring = decodeURIComponent(escape(allText[b][0]));
                     }
-                    catch(e)
-                    {
+                    catch(e){
                         fixedstring = allText[b][0];
                     }
                     
@@ -1513,17 +1231,13 @@ function readPhrase()
                     var answer = allText[b][1];
                     var ee = "y";
 
-                    if(answer.trim() === ee.trim())
-                    {
+                    if(answer.trim() === ee.trim()){
                         readMatch = true;
-                    }
-                    else
-                    {
+                    }else{
                         readMatch = false;
                     }
                     
-                    if(vvv === 1 || vvv === 4)
-                    {
+                    if(vvv === 1 || vvv === 4){
                         frTra[frTrak] = fixedstring + "." + readMatch;
                         frTrak++;
                     }
@@ -1536,14 +1250,12 @@ function readPhrase()
 }
 
 // pulisce lo schermo
-function cleanWindow()
-{
+function cleanWindow(){
     document.getElementById("spanArea").innerHTML = "";
 }
 
 // mostra un numero casuale al centro dello schermo; per le introduzioni degli spans
-function numCenterA()
-{
+function numCenterA(){
     var num = [
         '<div id="numberCenterA"></div>'
     ].join('');
@@ -1554,9 +1266,7 @@ function numCenterA()
         numTra[numTrak] = numberST;
         numTrak++;
         document.getElementById("numberCenterA").innerHTML = numberST;
-    }
-    else
-    {
+    }else{
         document.getElementById("numberCenterA").innerHTML = numTra[numTrak];
         numTrak++;
     }
@@ -1564,8 +1274,7 @@ function numCenterA()
 }
 
 //crea due bottoni dell'intervallo
-function buttons()
-{
+function buttons(){
     var b = [
         '<div id="decisionButtons">',
             '<a class="bttn cc" href="#0" id="choice1"></a>',
@@ -1575,24 +1284,20 @@ function buttons()
     document.getElementById("spanArea").innerHTML += b;
 }
 
-// piazza un numero al centro dello schermo
-function numCenter()
-{
+// centro nello schermo un numero
+function numCenter(){
     var num = [
         '<div id="numberCenter"></div>'
     ].join('');
     document.getElementById("spanArea").innerHTML = num;
-    if(typeof numTra[numTrak] === "undefined")
-    {
+    if(typeof numTra[numTrak] === "undefined"){
         var numRand = Math.floor(Math.random() * 90) + 10;
         numTra[numTrak] = numRand;
         document.getElementById("numberCenter").innerHTML = numRand;
         generatedNum[y] = numRand;
         y++;
         numTrak++;
-    }
-    else
-    {
+    }else{
         document.getElementById("numberCenter").innerHTML = numTra[numTrak];
         generatedNum[y] = numTra[numTrak];
         y++;
@@ -1601,18 +1306,14 @@ function numCenter()
 }
 
 // luce per la correttezza o meno della risposta
-function checkLight(a, b)
-{
+function checkLight(a, b){
     clearTimeout(timeOutLight);
     
-    if(a)
-    {
+    if(a){
         document.getElementById("lightButton").innerHTML = "Giusto!";
         document.getElementById("lightButton").style.color = "green";
         timeOutLight = setTimeout(cleanLight, b);  
-    }
-    else
-    {
+    }else{
         document.getElementById("lightButton").innerHTML = "Sbagliato!";
         document.getElementById("lightButton").style.color = "red";
         timeOutLight = setTimeout(cleanLight, b);
@@ -1620,8 +1321,7 @@ function checkLight(a, b)
 }
 
 // pulisce il div della luce verde/rossa
-function cleanLight()
-{
+function cleanLight(){
     document.getElementById("lightButton").innerHTML = "";
 }
 
@@ -1638,9 +1338,7 @@ function numberCheck(){
     ].join('');
     
     numcont = 1;
-    grade = 0;
-    dsPartialScore = 0;
-    
+
     startTime = new Date();
     durStartTime = new Date(new Date().getTime()).toLocaleTimeString() + " ." + new Date(new Date().getTime()).getMilliseconds();
     
@@ -1671,62 +1369,32 @@ function numberCheck(){
         var s = document.getElementById("inputUser").value;
         inputNum[x] = parseInt(s);
         if(generatedNum[x] === inputNum[x]){ //se il numero inserito è giusto.
-            grade++;
-            if(vvv !== 1 && vvv !== 4){ //TEST
+            if(vvv !== 1 && vvv !== 4){ //------TEST
                 if(ordineST === 0){ //OPERATION
-                    logResultsOST(0, testIndex + "," + "DigitSpan" + "," + durationTime + "," + durEndTime + "," + op + "," + 1 + "," + 0 + "," + fg + "," + 1 + "," + generatedNum[x] + "," + inputNum[x] + "," + "success" + "," + durStartTime + "," + dsItemNumber + ",");
-                }else{     //READING
-                    logResultsRST(0, testIndex + "," + "DigitSpan" + "," + durationTime + "," + durEndTime + "," + op + "," + 1 + "," + 0 + "," + fg + "," + 1 + "," + generatedNum[x] + "," + inputNum[x] + "," + "success" + "," + durStartTime + "," + dsItemNumber + ",");
+                    logResultsOST(testIndex + "," + "DigitSpan" + "," + op + "," + generatedNum[x] + "," + generatedNum[x] + "," + inputNum[x] + "," + "success" + "," + 1 +   "," + durStartTime + "," + durEndTime  + "," + durationTime);
+                }else{              //READING
+                    logResultsRST(testIndex + "," + "DigitSpan" + "," + op + "," + generatedNum[x] + "," + generatedNum[x] + "," + inputNum[x] + "," + "success" + "," + 1 +  "," + durStartTime + "," + durEndTime  + "," + durationTime);
                 }  
-            }else{ //TRAINING
+            }else{ //----------------------------TRAINING
                 checkLight(true, 600);
-                //logTrain(0, testIndex + "," + "DigitSpan" + "," + durationTime + "," + durEndTime + "," + op + "," + 1 + "," + 0 + "," + fg + "," + 1 + "," + generatedNum[x] + "," + inputNum[x] + "," + "success" + "," + durStartTime + "," + dsItemNumber + ",");
             }
         }else{ //se il numero inserito è sbagliato
-            if(vvv !== 1 && vvv !== 4){ //TEST
+            if(vvv !== 1 && vvv !== 4){ //-----TEST
                 if(ordineST === 0){   //OPERATION
-                    logResultsOST(0, testIndex + "," + "DigitSpan" + "," + durationTime + "," + durEndTime + "," + op + "," + 1 + "," + 0 + "," + fg + "," + 0 + "," + generatedNum[x] + "," + inputNum[x] + "," + "failure" + "," + durStartTime + "," + dsItemNumber + ",");
-                }else{    //READING
-                    logResultsRST(0, testIndex + "," + "DigitSpan" + "," + durationTime + "," + durEndTime + "," + op + "," + 1 + "," + 0 + "," + fg + "," + 0 + "," + generatedNum[x] + "," + inputNum[x] + "," + "failure" + "," + durStartTime + "," + dsItemNumber + ",");
+                    logResultsOST(testIndex + "," + "DigitSpan" + "," + op + "," + generatedNum[x] + "," + generatedNum[x] + "," + inputNum[x] + "," + "fail" + "," + 0 +  "," + durStartTime + "," + durEndTime  + "," + durationTime);
+                }else{                //READING
+                    logResultsRST(testIndex + "," + "DigitSpan" + "," + op + "," + generatedNum[x] + "," + generatedNum[x] + "," + inputNum[x] + "," + "fail" + "," + 0 +  "," + durStartTime + "," + durEndTime  + "," + durationTime);
                 }
-            }else{ //TRAINING
+            }else{ //-------------------------TRAINING
                 checkLight(false, 600);
-                //logTrain(0, testIndex + "," + "DigitSpan" + "," + durationTime + "," + durEndTime + "," + op + "," + 1 + "," + 0 + "," + fg + "," + 0 + "," + generatedNum[x] + "," + inputNum[x] + "," + "failure" + "," + durStartTime + "," + dsItemNumber + ",");
             }
         }
 
         x++;
         document.getElementById("inputUser").value = "";
-        if(x >= y){              //Se è l'ultimo test aggiorna il log di recap
-            dsTotScore += grade/op;
-            dsPartialScore += grade/op;
-
-            if(vvv !== 1 && vvv !== 4){
-                if(ordineST === 0){
-                    if(combOST[op-2] === 2){
-                        logOSTRecap("" + op + "," + (combOST[op-2]-1) + "," + grade + "," + dsPartialScore + ",");
-                    }else if(combOST[op-2] === 1){
-                        logOSTRecap("" + op + "," + (combOST[op-2]+1) + "," + grade + "," + dsPartialScore + ",");
-                    }else if(combOST[op-2] === 0){
-                        logOSTRecap("" + op + "," + (combOST[op-2]+3) + "," + grade + "," + dsPartialScore + ",");
-                    }
-                }
-
-                if(ordineST === 1){
-                    if(combRST[op-2] === 2){
-                       logRSTRecap("" + op + "," + (combRST[op-2]-1) + "," + grade + "," + dsPartialScore + ",");
-                    }else if(combRST[op-2] === 1){
-                        logRSTRecap("" + op + "," + (combRST[op-2]+1) + "," + grade + "," + dsPartialScore + ",");
-                    }else if(combRST[op-2] === 0){
-                        logRSTRecap("" + op + "," + (combRST[op-2]+3) + "," + grade + "," + dsPartialScore + ",");
-                    }
-                }    
-            }
-
+        if(x >= y){              
             ControlloCentrale();  
-        }
-        else
-        {
+        }else{
             numcont++;
             document.getElementById("lgInsertNumber").innerHTML = "Inserisci il numero " + numcont;
             startTime = new Date();
@@ -1735,7 +1403,7 @@ function numberCheck(){
     }
 }   
 
-// finisce i task e salva sui file excel tutti i dati raccolti
+// finisce i task e chiama le funzioni per salvare i dati
 function endIt(){    
     var p1 = [
         '<div id="p5">Il test è terminato. <br>Grazie!</div>'   //IN CASO QUA SI AGGIUNGE LINK AL TEST DI COMPRENSIBILITà
@@ -1743,74 +1411,62 @@ function endIt(){
     
     cleanWindow();
     document.getElementById("spanArea").innerHTML += p1;
-    saveResults2();
-    
-    //document.getElementById("uploadButton").addEventListener("click", formSave);
+    saveResultsOST();
+    saveResultsRST();
+
     formSave();
 }
 
-function formSave(){
-    //event.preventDefault();
+function saveResultsOST(){ //salva i risultati dell'operation span task
+    var testoBlob = new Blob([testoOST], {type:"text/csv"});
+    var textURL = window.URL.createObjectURL(testoBlob);
+    var downloadLink = document.createElement("a");
+    downloadLink.download = userId + "OST" + ".csv";
+    downloadLink.href = textURL;
+    downloadLink.innerHTML = "Scarica i risultati 2 ";
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+}
 
-    //var filenameST = userId + "TrainingST" + ".csv";
+function saveResultsRST(){ //salva i risultati del reading span task
+    var testoBlob = new Blob([testoRST], {type:"text/csv"});
+    var textURL = window.URL.createObjectURL(testoBlob);
+    var downloadLink = document.createElement("a");
+    downloadLink.download = userId + "RST" + ".csv";
+    downloadLink.href = textURL;
+    downloadLink.innerHTML = "Scarica i risultati 3 ";
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+}
+
+function formSave(){  //per inviare il file su server
+
     var filenameOST = userId + "OST" + ".csv";
     var filenameRST = userId + "RST" + ".csv";
-    //var myBlobST = new Blob([testoRisultati], {type:"text/csv"});
-    var myBlobOST = new Blob([testoRisultati3], {type:"text/csv"});
-    var myBlobRST = new Blob([testoRisultati5], {type:"text/csv"});
-    //var fileST = new File([myBlobST], filenameST);
+    var myBlobOST = new Blob([testoOST], {type:"text/csv"});
+    var myBlobRST = new Blob([testoRST], {type:"text/csv"});
     var fileOST = new File([myBlobOST], filenameOST);
     var fileRST = new File([myBlobRST], filenameRST);
-
-    //var formDataST = new FormData();
     var formDataOST = new FormData();
     var formDataRST = new FormData();
-    //formDataST.append('fileToUpload', fileST);
     formDataOST.append('fileToUpload', fileOST);
     formDataRST.append('fileToUpload', fileRST);
+
     
-
-/*     var xhr = new XMLHttpRequest();
-    //xhr.open('POST', 'RisultatiTest', true);
-    xhr.open('POST', 'https://brocciagi.github.io/upload.php', true);
-    xhr.onload = function (){
-        //if (xhr.status !== 200) 
-        //{
-        //  alert('An error occurred!');
-        //}
-        console.log("test")
+    var xhrOST = new XMLHttpRequest();
+    xhrOST.open('POST', 'https://wmspantasks.isti.cnr.it/upload.php', true);
+    xhrOST.onload = function (){
+        console.log("on load")
     };
-
-    xhr.send(formDataST); */
+    xhrOST.send(formDataOST);
     
-    var xhr2 = new XMLHttpRequest();
-    //xhr2.open('POST', 'RisultatiTest', true);
-    xhr2.open('POST', 'https://ssec.isti.cnr.it/upload.php', true);
-    xhr2.onload = function () 
-    {
-/*         if (xhr2.status !== 200) 
-        {
-          alert('An error occurred!');
-        } */
-        console.log("test")
-
+    var xhrRST = new XMLHttpRequest();
+    xhrRST.open('POST', 'https://wmspantasks.isti.cnr.it/upload.php', true);
+    xhrRST.onload = function (){
+        console.log("on load")
     };
-
-    xhr2.send(formDataOST);
-    
-    var xhr3 = new XMLHttpRequest();
-    //xhr3.open('POST', 'RisultatiTest', true);
-    xhr3.open('POST', 'https://ssec.isti.cnr.it/upload.php', true);
-    xhr3.onload = function () 
-    {
-/*         if (xhr3.status !== 200) 
-        {
-          alert('An error occurred!');
-        } */
-        console.log("test")
-
-    };
-
-    xhr3.send(formDataRST);
+    xhrRST.send(formDataRST);
 
 }
